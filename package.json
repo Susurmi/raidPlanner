@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "@discordjs/rest": "^1.1.0",
+    "ascii-table": "^0.0.9",
+    "discord.js": "^14.3.0",
+    "dotenv": "^16.0.2",
+    "moment": "^2.29.4"
+  },
+  "name": "raidplanner",
+  "description": "D2 Discord Raid Planner",
+  "version": "0.1",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "author": "Susurmi",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
