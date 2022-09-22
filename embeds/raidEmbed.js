@@ -2,7 +2,7 @@ const { EmbedBuilder } = require('discord.js');
 const { getPlayers } = require('../functions/getPlayers');
 
 async function raidEmbedBuilder(raidObject, interaction, participants) {
-  const { raidName, time, img } = raidObject;
+  const { raidName, time, img, leader } = raidObject;
 
   const players = getPlayers(participants);
   const { titan, warlock, hunter, counter } = players;
@@ -18,9 +18,7 @@ async function raidEmbedBuilder(raidObject, interaction, participants) {
   const raidEmbed = new EmbedBuilder()
     .setColor('White')
     .setTitle(`${raidName}`)
-    .setDescription(
-      `Leiter: ${interaction.user.tag} - ID: ${interaction.user.id}`
-    )
+    .setDescription(`Leiter: ${leader.nameTag} - ID: ${leader.id}`)
     .addFields({
       name: '\u200b',
       value: `**${raidObject.description}**\n \u200b`,

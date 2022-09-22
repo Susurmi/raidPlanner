@@ -75,13 +75,13 @@ module.exports = {
   async execute(interaction, client) {
     const raidName = raidNameConverter(interaction.options.get('name').value);
     const img = getImage(interaction.options.get('name').value);
-    const time = moment(
+    const time = await moment(
       interaction.options.get('datum').value +
         ' ' +
         interaction.options.get('uhrzeit').value,
-      'DD/MM/YYYY HH:MM'
+      'DD/MM/YYYY hh:mm'
     ).unix();
-    const postTime = moment().unix();
+    const postTime = await moment().unix();
 
     if (time < postTime) {
       interaction.reply({
