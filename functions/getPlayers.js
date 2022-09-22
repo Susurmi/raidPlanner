@@ -8,15 +8,15 @@ function getPlayers(participants) {
 
   participants.forEach((player) => {
     if (player.class === 'titan') {
-      players.titan += player.discordTag;
+      players.titan += `${player.discordTag}\n`;
       players.counter + 1;
     }
     if (player.class === 'warlock') {
-      players.warlock += player.discordTag;
+      players.warlock += `${player.discordTag}\n`;
       players.counter + 1;
     }
     if (player.class === 'hunter') {
-      players.hunter += player.discordTag;
+      players.hunter += `${player.discordTag}\n`;
       players.counter += 1;
     }
   });

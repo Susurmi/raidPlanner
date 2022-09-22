@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { raidEmbedBuilder } = require('../embeds.js/raidEmbed');
+const { raidEmbedBuilder } = require('../embeds/raidEmbed');
 const { getImage } = require('../functions');
 const { raidNameConverter } = require('../functions/nameConverter');
 const { raidButtonBuilder } = require('../components/raidButtons');

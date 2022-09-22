@@ -1,4 +1,4 @@
-const { raidEmbedBuilder } = require('../embeds.js/raidEmbed');
+const { raidEmbedBuilder } = require('../embeds/raidEmbed');
 
 async function joinRaid(interaction, client) {
   const { customId, user, message } = interaction;
