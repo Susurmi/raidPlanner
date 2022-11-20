@@ -126,6 +126,21 @@ module.exports = {
     });
 
     raidObject.id = message.id;
+    let doc = await raidModel.create({
+      id: raidObject.id,
+      guildId: raidObject.guildId,
+      channelId: raidObject.channelId,
+      leader: {
+        id: raidObject.leader.id,
+        nameTag: raidObject.leader.nameTag,
+      },
+      raidName: raidObject.raidName,
+      time: raidObject.time,
+      postTime: raidObject.postTime,
+      description: raidObject.description,
+      participants: raidObject.participants,
+    });
+    await doc.save();
     client.raid.push(raidObject);
   },
 };

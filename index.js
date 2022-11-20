@@ -5,6 +5,8 @@ const {
   loadCommands,
   loadEvents,
 } = require('./handler/index.js');
+const { getRaids } = require('./database/getEvents.js');
+const { connectDatabase } = require('./database/index.js');
 
 const TOKEN = process.env.BOT_TOKEN;
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
@@ -23,10 +25,12 @@ client.raid = [];
 
 async function main() {
   try {
+    await connectDatabase(DB_URI);
     loadEvents(client);
     loadCommands(client);
     deployCommands(CLIENT_ID, GUILD_ID, TOKEN);
     client.login(TOKEN);
+    await getRaids(client);
   } catch (err) {
     console.log(err);
   }
