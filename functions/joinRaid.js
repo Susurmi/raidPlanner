@@ -1,3 +1,4 @@
+const raidModel = require('../database/models/raidModel');
 const { raidEmbedBuilder } = require('../embeds/raidEmbed');
 
 async function joinRaid(interaction, client) {
@@ -40,6 +41,14 @@ async function joinRaid(interaction, client) {
       .indexOf(user.id);
     if (!raidObject.participants[index].discordID === user.id) return;
     raidObject.participants.splice(index, 1);
+
+    const dbEntry = await raidModel.findOneAndUpdate(
+      { id: message.id },
+      {
+        $pull: { participants: { discordId: interaction.user.id } },
+      }
+    );
+    dbEntry.save();
 
     const deletedPlayer = await raidEmbedBuilder(
       raidObject,
@@ -97,6 +106,13 @@ async function joinRaid(interaction, client) {
       discordTag: user.tag,
       class: customId,
     };
+
+    const dbEntry = await raidModel.findOneAndUpdate(
+      { id: message.id },
+      { participants: { newParticipant } }
+    );
+
+    dbEntry.save();
 
     raidObject.participants.push(newParticipant);
 
