@@ -73,23 +73,23 @@ module.exports = {
         )
     ),
   async execute(interaction, client) {
+    const raidButtons = raidButtonBuilder;
     const raidName = raidNameConverter(interaction.options.get('name').value);
     const img = getImage(interaction.options.get('name').value);
+    const dateField = interaction.options.get('datum').value;
+    const timeField = interaction.options.get('uhrzeit').value;
+    const postTime = await moment().unix();
     const time = await moment(
-      interaction.options.get('datum').value +
-        ' ' +
-        interaction.options.get('uhrzeit').value,
+      dateField + ' ' + timeField,
       'DD/MM/YYYY hh:mm'
     ).unix();
-    const postTime = await moment().unix();
 
-    if (time < postTime) {
-      interaction.reply({
+    if (time < postTime)
+      return interaction.reply({
         content: 'Inkorrektes Datum/Uhrzeit! ⏲',
         ephemeral: true,
       });
-      return;
-    }
+
     const raidObject = {
       id: '',
       leader: {
@@ -117,8 +117,6 @@ module.exports = {
     );
     interaction.reply({ content: 'Event erstellt.', ephemeral: true });
 
-    const raidButtons = raidButtonBuilder;
-
     const message = await interaction.channel.send({
       embeds: [raidEmbed],
       components: [raidButtons],
@@ -126,21 +124,9 @@ module.exports = {
     });
 
     raidObject.id = message.id;
-    let doc = await raidModel.create({
-      id: raidObject.id,
-      guildId: raidObject.guildId,
-      channelId: raidObject.channelId,
-      leader: {
-        id: raidObject.leader.id,
-        nameTag: raidObject.leader.nameTag,
-      },
-      raidName: raidObject.raidName,
-      time: raidObject.time,
-      postTime: raidObject.postTime,
-      description: raidObject.description,
-      participants: raidObject.participants,
-    });
+    let doc = await raidModel.create(raidObject);
+    client.raid.push(doc);
     await doc.save();
-    client.raid.push(raidObject);
+    return;
   },
 };

@@ -11,14 +11,12 @@ module.exports = {
 
     if (!command) return;
 
-    try {
-      await command.execute(interaction, client);
-    } catch (error) {
-      console.error(error);
-      await interaction.reply({
+    await command.execute(interaction, client).catch((e) => {
+      console.error(e);
+      interaction.reply({
         content: 'Es ist ein Fehler aufgetreten! 🛑',
         ephemeral: true,
       });
-    }
+    });
   },
 };
