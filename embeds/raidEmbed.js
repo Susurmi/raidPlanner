@@ -54,6 +54,7 @@ async function raidEmbedBuilder(raidObject, interaction, participants) {
       value: '\u200b',
     })
     .setImage(img)
+    .setFooter({ text: `${raidObject._id}, Raid Planner by Susurmi` })
     .toJSON();
 
   return raidEmbed;

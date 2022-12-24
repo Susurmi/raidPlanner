@@ -3,8 +3,7 @@ const { raidEmbedBuilder } = require('../embeds/raidEmbed');
 const { getImage } = require('../functions');
 const { raidNameConverter } = require('../functions/nameConverter');
 const { raidButtonBuilder } = require('../components/raidButtons');
-const moment = require('moment');
-moment.locale('de');
+const { convertToUnix } = require('../functions/timeUtil');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -79,10 +78,7 @@ module.exports = {
     const dateField = interaction.options.get('datum').value;
     const timeField = interaction.options.get('uhrzeit').value;
     const postTime = await moment().unix();
-    const time = await moment(
-      dateField + ' ' + timeField,
-      'DD/MM/YYYY hh:mm'
-    ).unix();
+    const time = convertToUnix(dateField, timeField);
 
     if (time < postTime)
       return interaction.reply({
@@ -90,7 +86,7 @@ module.exports = {
         ephemeral: true,
       });
 
-    const raidObject = {
+    let newRaid = await raidModel.create({
       id: '',
       leader: {
         id: interaction.user.id,
@@ -108,12 +104,12 @@ module.exports = {
           class: interaction.options.get('class').value,
         },
       ],
-    };
+    });
 
     const raidEmbed = await raidEmbedBuilder(
-      raidObject,
+      newRaid,
       interaction,
-      raidObject.participants
+      newRaid.participants
     );
     interaction.reply({ content: 'Event erstellt.', ephemeral: true });
 
@@ -123,10 +119,9 @@ module.exports = {
       fetchReply: true,
     });
 
-    raidObject.id = message.id;
-    let doc = await raidModel.create(raidObject);
-    client.raid.push(doc);
-    await doc.save();
+    newRaid.id = message.id;
+    client.raid.push(newRaid);
+    await newRaid.save();
     return;
   },
 };

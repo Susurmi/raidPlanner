@@ -4,7 +4,8 @@
     "ascii-table": "^0.0.9",
     "discord.js": "^14.3.0",
     "dotenv": "^16.0.2",
-    "moment": "^2.29.4"
+    "moment": "^2.29.4",
+    "mongoose": "^6.8.1"
   },
   "name": "raidplanner",
   "description": "D2 Discord Raid Planner",
