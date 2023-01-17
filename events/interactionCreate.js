@@ -10,13 +10,20 @@ module.exports = {
     const command = interaction.client.commands.get(interaction.commandName);
 
     if (!command) return;
-
-    await command.execute(interaction, client).catch((e) => {
+    try {
+      command.execute(interaction, client);
+    } catch (error) {
       console.error(e);
+      if (command.isDeferred) {
+        return interaction.editReply({
+          content: 'Es ist ein Fehler aufgetreten! 🛑',
+          ephemeral: true,
+        });
+      }
       interaction.reply({
         content: 'Es ist ein Fehler aufgetreten! 🛑',
         ephemeral: true,
       });
-    });
+    }
   },
 };

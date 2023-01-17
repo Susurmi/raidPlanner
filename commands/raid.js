@@ -71,7 +71,9 @@ module.exports = {
           }
         )
     ),
+  isDeferred: true,
   async execute(interaction, client) {
+    interaction.deferReply({ ephemeral: true });
     const raidButtons = raidButtonBuilder;
     const raidName = raidNameConverter(interaction.options.get('name').value);
     const img = getImage(interaction.options.get('name').value);
@@ -111,7 +113,7 @@ module.exports = {
       interaction,
       newRaid.participants
     );
-    interaction.reply({ content: 'Event erstellt.', ephemeral: true });
+    interaction.editReply({ content: 'Event erstellt.', ephemeral: true });
 
     const message = await interaction.channel.send({
       embeds: [raidEmbed],
