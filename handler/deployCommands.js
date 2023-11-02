@@ -1,26 +1,47 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Routes } = require('discord.js');
-const { REST } = require('@discordjs/rest');
+const { REST, Routes } = require('discord.js');
 
-async function deployCommands(clientID, guildID, botToken) {
-  const rest = new REST({ version: '10' }).setToken(botToken);
-  const commands = [];
-  const commandsPath = path.join(__dirname, '../commands');
-  const commandFiles = fs
-    .readdirSync(commandsPath)
-    .filter((file) => file.endsWith('.js'));
+/**
+ *
+ * @param {string} clientId
+ * @param {string} guildId
+ * @param {string} token
+ */
+async function deployCommands(clientId, guildId, token) {
+	const commands = [];
+	const foldersPath = path.join(__dirname, 'commands');
+	const commandFolders = fs.readdirSync(foldersPath);
 
-  for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    const command = require(filePath);
-    commands.push(command.data.toJSON());
-  }
+	for (const folder of commandFolders) {
+		const commandsPath = path.join(foldersPath, folder);
+		const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith('.js'));
+		for (const file of commandFiles) {
+			const filePath = path.join(commandsPath, file);
+			const command = require(filePath);
+			if ('data' in command && 'execute' in command) {
+				commands.push(command.data.toJSON());
+			} else {
+				console.log(
+					`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`,
+				);
+			}
+		}
+	}
 
-  console.log('Aktualisieren aller (/) Befehle gestartet.');
-  await rest.put(Routes.applicationGuildCommands(clientID, guildID), {
-    body: commands,
-  });
+	const rest = new REST().setToken(token);
+
+	try {
+		console.log(`Started refreshing ${commands.length} application (/) commands.`);
+
+		const data = await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
+			body: commands,
+		});
+
+		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+	} catch (error) {
+		console.error(error);
+	}
 }
 
 module.exports = { deployCommands };

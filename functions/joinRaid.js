@@ -1,140 +1,132 @@
+const { Client, BaseInteraction } = require('discord.js');
 const raidModel = require('../database/models/raidModel');
 const { raidEmbedBuilder } = require('../embeds/raidEmbed');
 
+/**
+ *
+ * @param {BaseInteraction} interaction
+ * @param {Client} client
+ */
 async function joinRaid(interaction, client) {
-  const { customId, user, message } = interaction;
+	const { customId, user, message } = interaction;
 
-  const raidObject = await client.raid.find((x) => x.id === message.id);
-  if (raidObject === undefined) {
-    interaction.reply({
-      content: 'Dieses Event existiert nicht mehr!',
-      ephemeral: true,
-    });
-    return;
-  }
+	const raidObject = await client.raid.find((x) => x.id === message.id);
+	if (raidObject === undefined) {
+		interaction.reply({
+			content: 'Dieses Event existiert nicht mehr!',
+			ephemeral: true,
+		});
+		return;
+	}
 
-  const participant = raidObject.participants.find(
-    (x) => x.discordID === user.id
-  );
+	const participant = raidObject.participants.find((x) => x.discordID === user.id);
 
-  if (customId === 'quit') {
-    if (user.id === raidObject.leader.id) {
-      interaction.reply({
-        content: 'Möchtest du dein Event löschen?',
-        ephemeral: true,
-      });
-      return;
-    }
+	if (customId === 'quit') {
+		if (user.id === raidObject.leader.id) {
+			interaction.reply({
+				content: 'Möchtest du dein Event löschen?',
+				ephemeral: true,
+			});
+			return;
+		}
 
-    if (!participant || participant === undefined) {
-      interaction.reply({
-        content: 'Du bist nicht teil dieses Raidtrupps!',
-        ephemeral: true,
-      });
-      return;
-    }
+		if (!participant || participant === undefined) {
+			interaction.reply({
+				content: 'Du bist nicht teil dieses Raidtrupps!',
+				ephemeral: true,
+			});
+			return;
+		}
 
-    let index = raidObject.participants
-      .map((x) => {
-        return x.discordID;
-      })
-      .indexOf(user.id);
-    if (!raidObject.participants[index].discordID === user.id) return;
-    raidObject.participants.splice(index, 1);
+		const index = raidObject.participants
+			.map((x) => {
+				return x.discordID;
+			})
+			.indexOf(user.id);
+		if (!raidObject.participants[index].discordID === user.id) return;
+		raidObject.participants.splice(index, 1);
 
-    const dbEntry = await raidModel.findOneAndUpdate(
-      { id: message.id },
-      {
-        $pull: { participants: { discordId: interaction.user.id } },
-      }
-    );
-    dbEntry.save();
+		const dbEntry = await raidModel.findOneAndUpdate(
+			{ id: message.id },
+			{
+				$pull: { participants: { discordId: interaction.user.id } },
+			},
+		);
+		dbEntry.save();
 
-    const deletedPlayer = await raidEmbedBuilder(
-      raidObject,
-      interaction,
-      raidObject.participants
-    );
+		const deletedPlayer = await raidEmbedBuilder(raidObject, interaction, raidObject.participants);
 
-    message.edit({ embeds: [deletedPlayer] });
+		message.edit({ embeds: [deletedPlayer] });
 
-    interaction.reply({
-      content: 'Du hast dich vom Raid abgemeldet!',
-      ephemeral: true,
-    });
+		interaction.reply({
+			content: 'Du hast dich vom Raid abgemeldet!',
+			ephemeral: true,
+		});
 
-    return;
-  }
+		return;
+	}
 
-  if (participant && participant != undefined) {
-    if (participant.class === customId) {
-      interaction.reply({
-        content: 'Du bist bereits mit dieser Klasse angemeldet!',
-        ephemeral: true,
-      });
-      return;
-    }
-    if (participant.class != customId) {
-      participant.class = customId;
+	if (participant && participant != undefined) {
+		if (participant.class === customId) {
+			interaction.reply({
+				content: 'Du bist bereits mit dieser Klasse angemeldet!',
+				ephemeral: true,
+			});
+			return;
+		}
+		if (participant.class != customId) {
+			participant.class = customId;
 
-      interaction.reply({
-        content: 'Du hast deine Klasse geändert!',
-        ephemeral: true,
-      });
+			interaction.reply({
+				content: 'Du hast deine Klasse geändert!',
+				ephemeral: true,
+			});
 
-      const classChange = await raidEmbedBuilder(
-        raidObject,
-        interaction,
-        raidObject.participants
-      );
+			const classChange = await raidEmbedBuilder(raidObject, interaction, raidObject.participants);
 
-      message.edit({ embeds: [classChange] });
-      return;
-    }
-  }
+			message.edit({ embeds: [classChange] });
+			return;
+		}
+	}
 
-  if (participant === undefined) {
-    if (raidObject.participants.length > 5) {
-      interaction.reply({
-        content: 'Dieser Raid ist leider voll!',
-        ephemeral: true,
-      });
-      return;
-    }
-    const newParticipant = {
-      discordID: user.id,
-      discordTag: user.tag,
-      class: customId,
-    };
+	if (participant === undefined) {
+		if (raidObject.participants.length > 5) {
+			interaction.reply({
+				content: 'Dieser Raid ist leider voll!',
+				ephemeral: true,
+			});
+			return;
+		}
+		const newParticipant = {
+			discordID: user.id,
+			discordTag: user.tag,
+			class: customId,
+		};
 
-    const dbEntry = await raidModel.findOneAndUpdate(
-      { id: message.id },
-      { participants: { newParticipant } }
-    );
+		const dbEntry = await raidModel.findOneAndUpdate(
+			{ id: message.id },
+			{ participants: { newParticipant } },
+		);
 
-    dbEntry.save();
+		dbEntry.save();
 
-    raidObject.participants.push(newParticipant);
+		raidObject.participants.push(newParticipant);
 
-    interaction.reply({
-      content: 'Du hast dich erfolgreich für den Raid eingetragen!',
-      ephemeral: true,
-    });
+		interaction.reply({
+			content: 'Du hast dich erfolgreich für den Raid eingetragen!',
+			ephemeral: true,
+		});
 
-    const addPlayer = await raidEmbedBuilder(
-      raidObject,
-      interaction,
-      raidObject.participants
-    );
+		const addPlayer = await raidEmbedBuilder(raidObject, interaction, raidObject.participants);
 
-    message.edit({ embeds: [addPlayer] });
-  } else {
-    interaction.reply({
-      content: 'Es gab einen Fehler! 🛑',
-      ephemeral: true,
-    });
-    return;
-  }
+		message.edit({ embeds: [addPlayer] });
+	} else {
+		interaction.reply({
+			content: 'Es gab einen Fehler! 🛑',
+			ephemeral: true,
+		});
+		return;
+	}
 }
 
 module.exports = { joinRaid };

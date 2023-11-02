@@ -1,23 +1,29 @@
 {
 	"name": "raidplanner",
-	"description": "D2 Discord Raid Planner",
+	"description": "Destiny 2 Discord Raid Planner",
 	"version": "0.1",
 	"main": "index.js",
 	"scripts": {
 		"dev": "nodemon index.js",
-		"start": "node index.js"
+		"start": "node index.js",
+		"lint": "eslint ."
 	},
 	"author": "Susurmi",
 	"license": "MIT",
 	"dependencies": {
 		"@discordjs/rest": "^1.1.0",
 		"ascii-table": "^0.0.9",
-		"discord.js": "^14.3.0",
-		"dotenv": "^16.0.2",
+		"discord.js": "^14.13.0",
+		"dotenv": "^16.3.1",
 		"moment": "^2.29.4",
-		"mongoose": "^6.8.1"
+		"mongoose": "^8.0.0"
 	},
 	"devDependencies": {
+		"eslint": "^8.52.0",
+		"eslint-plugin-jsdoc": "^46.8.2",
 		"nodemon": "^3.0.1"
+	},
+	"overrides": {
+		"undici": "5.26.3"
 	}
 }
