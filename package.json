@@ -22,8 +22,5 @@
 		"eslint": "^8.52.0",
 		"eslint-plugin-jsdoc": "^46.8.2",
 		"nodemon": "^3.0.1"
-	},
-	"overrides": {
-		"undici": "5.26.3"
 	}
 }
